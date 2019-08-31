@@ -1,6 +1,7 @@
 import React from 'react';
 import Dawn from "../../common/api.js";
 require('./search.css');
+const STORAGE_SEARCH_HISTORY = 'search_history_storage';
 export default class Search extends React.Component {
   constructor(props) {
     super(props);
@@ -12,7 +13,7 @@ export default class Search extends React.Component {
 
   /**
    *  html seciton
-   */ 
+   */
   render() {
     const { arr = [], val } = this.state;
     const className = 'search-item';
@@ -80,6 +81,7 @@ export default class Search extends React.Component {
     if (!val) return;
     this.setVal(val, false, index);
     this.setState({ index: index });
+    this.confrimClick(val);
   }
 
   setVal(val, updateVal) {
@@ -90,11 +92,12 @@ export default class Search extends React.Component {
   }
 
   isAssociation(kc) {
-    return (kc === 38 || kc === 40) && this.state.arr && this.state.arr.length > 0
+    return (kc === 38 || kc === 40 || kc === 13) && this.state.arr && this.state.arr.length > 0
   }
 
   keyCode(e) {
     const kc = e.keyCode || 0;
+    const _val = this.refs.input.value || '';
     if (!this.isAssociation(kc)) return;
     const len = this.state.arr.length;
     let last = this.state.index;
@@ -114,6 +117,9 @@ export default class Search extends React.Component {
       this.setState({ index: ++last }, () => {
         this.setNowItem();
       });
+    }
+    if (kc === 13) {
+      this.confrimClick(_val);
     }
   }
 
@@ -143,5 +149,28 @@ export default class Search extends React.Component {
     };
   }
 
-  
+  /*** 
+   * @param {String} val 用户选中的内容
+  */
+  confrimClick(val) {
+    if (!val) return false;
+    console.log('click confirm ?', val)
+    this.setHistoricalRecords(val);
+  }
+
+
+  /*** 
+   * const STORAGE_SEARCH_HISTORY : search_history_storage;
+  */
+  setHistoricalRecords(val) {
+
+  }
+
+  getHistoricalRecords() {
+
+  }
+
+  rmHistoricalRecords() {
+
+  }
 }
