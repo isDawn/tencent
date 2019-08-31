@@ -5,9 +5,47 @@ export default class Search extends React.Component {
   constructor(props) {
     super(props);
     this.state = Object.assign({
-      billData: [],
+      arr: [],
       index: -1
     }, props);
+  }
+
+  /**
+   *  html seciton
+   */ 
+  render() {
+    const { arr = [], val } = this.state;
+    const className = 'search-item';
+    const active = 'active-item-color';
+    const newArr = [];
+    return (
+      <div className="search-b">
+        <input className="search-img" ref='input'
+          value={val || ''}
+          placeholder="请输入"
+          onFocus={this.onLoseAndObtainFocus.bind(this)}
+          onBlur={this.onLoseAndObtainFocus.bind(this)}
+          onKeyDown={this.keyCode.bind(this)}
+          onChange={this.onChange.bind(this)}
+        />
+        <div className="search-content">
+          {
+            arr.map((item, index) => {
+              const isTrue = index === this.state.index;
+              newArr.push(isTrue);
+              const newStr = newArr.includes(true) ? item : item.split(val).join(`<font color=red>${val}</font>`)
+              return (
+                <div className={isTrue ? active : className}
+                  onClick={this.itemClick.bind(this, item, index)}
+                  key={item}>
+                  <p dangerouslySetInnerHTML={{ __html: newStr }} />
+                </div>
+              )
+            })
+          }
+        </div>
+      </div>
+    )
   }
 
   /** 
@@ -105,38 +143,5 @@ export default class Search extends React.Component {
     };
   }
 
-  render() {
-    const { arr = [], val } = this.state;
-    const className = 'search-item';
-    const active = 'active-item-color';
-    const newArr = [];
-    return (
-      <div className="search-b">
-        <input className="search-img" ref='input'
-          value={val || ''}
-          placeholder="请输入"
-          onFocus={this.onLoseAndObtainFocus.bind(this)}
-          onBlur={this.onLoseAndObtainFocus.bind(this)}
-          onKeyDown={this.keyCode.bind(this)}
-          onChange={this.onChange.bind(this)}
-        />
-        <div className="search-content">
-          {
-            arr.map((item, index) => {
-              const isTrue = index === this.state.index;
-              newArr.push(isTrue);
-              const newStr = newArr.includes(true) ? item : item.split(val).join(`<font color=red>${val}</font>`)
-              return (
-                <div className={isTrue ? active : className}
-                  onClick={this.itemClick.bind(this, item, index)}
-                  key={item}>
-                  <p dangerouslySetInnerHTML={{ __html: newStr }} />
-                </div>
-              )
-            })
-          }
-        </div>
-      </div>
-    )
-  }
+  
 }
