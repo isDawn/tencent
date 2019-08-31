@@ -174,3 +174,25 @@ export default class Search extends React.Component {
 
   }
 }
+
+
+// history
+
+export  class History extends React.Component {
+  constructor(props) {
+    super(props)
+    this.props = props;
+  }
+
+
+  /** 
+   * history----html
+  */
+  render() {
+    return(
+      <div className = "search-history">
+
+      </div>
+    )
+  }
+}
