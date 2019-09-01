@@ -143,6 +143,7 @@ export default class Search extends React.Component {
     if (tp === 'focus') {
       // 聚焦
       this.setState({ index: _index });
+      this.onChange(); //聚焦时请求下数据刷新 防止还是上次数据
     };
     if (tp === 'blur') {
       // 失焦
