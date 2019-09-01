@@ -9,13 +9,17 @@
     padding-top:100px;
 }
 
-.search-img {
+.search-input {
     width:480px;
     height:30px;
     padding-left:20px;
 }
 
-.search-content {
+.search-input:focus {
+    outline: none;
+}
+
+.search-content,.search-history {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -27,7 +31,10 @@
 }
 
 
-.search-item,.active-item-color {
+.search-item,
+.active-item-color,
+.history-item ,
+.history-item-color{
     display: flex;
     align-items: center;
     width:100%;
@@ -39,6 +46,18 @@
     cursor: pointer;
 }
 
-.active-item-color {
+.active-item-color ,
+.history-item-color{
     background: #ccc;
+}
+
+.history-item ,
+.history-item-color{
+    color: #0000CC;
+}
+
+.close-history {
+    width:100%;
+    height:30px;
+    background:#f8f8f8;
 }
