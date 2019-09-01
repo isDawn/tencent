@@ -1,5 +1,6 @@
 import React from 'react';
 import Dawn from "../../common/api.js";
+import imgUrl from "./rm-his.jpg";
 require('./search.css');
 const STORAGE_SEARCH_HISTORY = 'search_history_storage';
 export default class Search extends React.Component {
@@ -49,7 +50,9 @@ export default class Search extends React.Component {
                 historyFlag={historyFlag}
                 historyList={historyList}
                 index={index}
-                itemClick = {this.itemClick.bind(this)}
+                itemClick={this.itemClick.bind(this)}
+                closeHistory={this.closeHistory.bind(this)}
+                rmHistoricalRecords = {this.rmHistoricalRecords.bind(this)}
               />
           }
         </div>
@@ -73,7 +76,7 @@ export default class Search extends React.Component {
     const _this = this;
     this.setVal(_val, true);
     if (!_val) {
-      this.setState({ arr: [] })
+      this.setState({ arr: []})
       return false;
     };
     Dawn.request({ url: './fake_data.json' }, (res) => {
@@ -86,10 +89,14 @@ export default class Search extends React.Component {
   }
 
   itemClick(val, index) {
-    if (!val) return;
-    this.setVal(val, false);
-    this.setState({ index: index });
-    this.confrimClick(val);
+    if (!this.isMultipleClicks) {
+      this.isMultipleClicks = true;
+      if (!val) return;
+      this.setVal(val, false);
+      this.setState({ index: index });
+      this.confrimClick(val);
+      setTimeout(() => { this.isMultipleClicks = false; }, 500)
+    }
   }
 
   setVal(val, updateVal) {
@@ -103,7 +110,7 @@ export default class Search extends React.Component {
         index = -1;
         historyList = this.getHistoricalRecords();
       }
-      this.setState({ isUserWrite, index, historyList});
+      this.setState({ isUserWrite, index, historyList });
     }
     this.setState({ val: val });
   }
@@ -169,9 +176,10 @@ export default class Search extends React.Component {
       // 聚焦
       this.setState({ index: _index });
       this.onChange(); //聚焦时请求下数据刷新 防止还是上次数据
-    if (tp === 'blur') {
-      // 失焦
-    };
+      if (tp === 'blur') {
+        // 失焦
+      };
+    }
   }
 
   /*** 
@@ -189,20 +197,36 @@ export default class Search extends React.Component {
   */
   setHistoricalRecords(val) {
     let newArr = this.getHistoricalRecords();
-    let existence = newArr.some((item)=>{ return item === val;}) 
+    let existence = newArr.some((item) => { return item === val; })
     if (existence) return;
     newArr.push(val);
-    console.log('set_storage---',newArr)
-    localStorage.setItem(STORAGE_SEARCH_HISTORY,JSON.stringify(newArr));
+    console.log('set_storage---', newArr)
+    localStorage.setItem(STORAGE_SEARCH_HISTORY, JSON.stringify(newArr));
   }
 
   getHistoricalRecords() {
-    const getStorageData = localStorage.getItem(STORAGE_SEARCH_HISTORY)  || '[]';
+    const getStorageData = localStorage.getItem(STORAGE_SEARCH_HISTORY) || '[]';
     return JSON.parse(getStorageData);
   }
 
-  rmHistoricalRecords(val) {
+  rmHistoricalRecords(v,i,f) {
+    const his = this.getHistoricalRecords();
+    this.rmAll();
+    if (f  || his.length <= 1) return;
+    const newHistoryData = his.filter((item,index)=>{return i !== index})
+    newHistoryData.forEach((item)=>{
+      this.setHistoricalRecords(item);
+    })
+    this.setState({historyList:newHistoryData});
+  }
 
+  rmAll() {
+    localStorage.removeItem(STORAGE_SEARCH_HISTORY);
+    this.setState({historyList:[],val:''});
+  }
+
+  closeHistory() {
+    this.setState({ historyFlag: false });
   }
 }
 
@@ -214,6 +238,7 @@ export class History extends React.Component {
     super(props)
     this.props = props;
     if (!this.props.historyFlag) return;
+    this.state =  {rmHistoricalP:false};
   }
 
 
@@ -221,27 +246,58 @@ export class History extends React.Component {
    * history----html
   */
   render() {
-    const { historyList, index } = this.props;
+    const { historyList, index, historyFlag } = this.props;
+    const rmHistoricalP = this.state ? this.state.rmHistoricalP : false;
     if (!historyList || historyList.length === 0) return false;
     return (
       <div className="search-history" >
         {
-          historyList.map((item, hIndex) => {
+          historyFlag ? historyList.map((item, hIndex) => {
             const isChoice = index === hIndex;
             return (
               <div
                 className={isChoice ? 'history-item-color' : 'history-item'}
                 key={item}
-                onClick = {this.props.itemClick ? ()=>{this.props.itemClick(item,hIndex)} : ''}>
-                  {item}
+                onDoubleClick={this.onDoubleClick.bind(this,item,hIndex)}
+                onClick={this.props.itemClick ? () => { this.props.itemClick(item, hIndex) } : ''}>
+                {item}
               </div>
             )
-          })
+          }) : ''
         }
-        <div className = 'close-history'>
-          <div>关闭历史记录</div>
-        </div>
+        {
+          historyFlag ? 
+          (<div className='close-history'>
+            <div onClick={this.props.closeHistory}>关闭历史记录</div>
+          </div>) : ''
+        }
+        {
+          rmHistoricalP ? 
+          (<div  className = 'rm-history-b'>
+            <div>
+              <img src = {imgUrl} />
+              <div onClick = {this.rmHistory.bind(this,false)}>删除当前历史</div>
+              <div onClick = {this.rmHistory.bind(this,true)}>删除全部历史</div>
+              <div onClick = {this.rmBack.bind(this)}>返回</div>
+            </div>
+          </div>) : ''
+        }
       </div>
     )
+  }
+
+  onDoubleClick(item,index) {
+    this.historyItem = item;
+    this.historyIndex = index;
+    this.setState({rmHistoricalP:true});
+  }
+
+  rmBack() {
+    this.setState({rmHistoricalP:false});
+  }
+
+  rmHistory(flag) {
+    this.rmBack();
+    this.props.rmHistoricalRecords(this.historyItem,this.historyIndex,flag);
   }
 }
