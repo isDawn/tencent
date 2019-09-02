@@ -1,6 +1,7 @@
 import React from 'react';
 import Dawn from "../../common/api.js";
-import imgUrl from "./rm-his.jpg";
+import his_img_url from "../../assets/img/rm-his.jpg";
+import eye_img_url from "../../assets/img/eye.png";
 require('./search.css');
 const STORAGE_SEARCH_HISTORY = 'search_history_storage';
 const STORAGE_HISTORY_FLAG = 'history_flag_storage';
@@ -34,7 +35,7 @@ export default class Search extends React.Component {
             onKeyDown={this.keyCode.bind(this)}
             onChange={this.onChange.bind(this)}
           />
-         { !historyFlag && <div className='eyes' onClick = {this.openHistory.bind(this)}>0</div> }
+         { !historyFlag && <img className='eyes' src = {eye_img_url} onClick = {this.openHistory.bind(this)} />}
         </div>
         <div className="search-content">
           {
@@ -292,7 +293,7 @@ export class History extends React.Component {
           rmHistoricalP ?
             (<div className='rm-history-b'>
               <div>
-                <img src={imgUrl} />
+                <img src={his_img_url} />
                 <div onClick={this.rmHistory.bind(this, false)}>删除当前历史</div>
                 <div onClick={this.rmHistory.bind(this, true)}>删除全部历史</div>
                 <div onClick={this.rmBack.bind(this)}>返回</div>
