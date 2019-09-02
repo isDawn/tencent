@@ -99,3 +99,16 @@
     width:100%;
     height:200px;
 }
+
+.input-and-eye {
+    position: relative;
+}
+
+.eyes {
+    position: absolute;
+    top:8px;
+    right:10px;
+    width:30px;
+    height:20px;
+    background:red;
+}

@@ -3,6 +3,7 @@ import Dawn from "../../common/api.js";
 import imgUrl from "./rm-his.jpg";
 require('./search.css');
 const STORAGE_SEARCH_HISTORY = 'search_history_storage';
+const STORAGE_HISTORY_FLAG = 'history_flag_storage';
 export default class Search extends React.Component {
   constructor(props) {
     super(props);
@@ -24,14 +25,17 @@ export default class Search extends React.Component {
     const newArr = [];
     return (
       <div className="search-b">
-        <input className="search-input" ref='input'
-          value={val || ''}
-          placeholder="请输入"
-          onFocus={this.onLoseAndObtainFocus.bind(this)}
-          onBlur={this.onLoseAndObtainFocus.bind(this)}
-          onKeyDown={this.keyCode.bind(this)}
-          onChange={this.onChange.bind(this)}
-        />
+        <div className = 'input-and-eye'>
+          <input className="search-input" ref='input'
+            value={val || ''}
+            placeholder="请输入"
+            onFocus={this.onLoseAndObtainFocus.bind(this)}
+            onBlur={this.onLoseAndObtainFocus.bind(this)}
+            onKeyDown={this.keyCode.bind(this)}
+            onChange={this.onChange.bind(this)}
+          />
+         { !historyFlag && <div className='eyes' onClick = {this.openHistory.bind(this)}>0</div> }
+        </div>
         <div className="search-content">
           {
             isUserWrite && val ? arr.map((item, Iindex) => {
@@ -52,7 +56,7 @@ export default class Search extends React.Component {
                 index={index}
                 itemClick={this.itemClick.bind(this)}
                 closeHistory={this.closeHistory.bind(this)}
-                rmHistoricalRecords = {this.rmHistoricalRecords.bind(this)}
+                rmHistoricalRecords={this.rmHistoricalRecords.bind(this)}
               />
           }
         </div>
@@ -63,7 +67,9 @@ export default class Search extends React.Component {
   /** 
    * 组件加载
   */
-  componentDidMount() { }
+  componentDidMount() { 
+    this.setState({historyFlag:this.getHistoryFlag()});
+  }
 
 
   /**
@@ -76,7 +82,7 @@ export default class Search extends React.Component {
     const _this = this;
     this.setVal(_val, true);
     if (!_val) {
-      this.setState({ arr: []})
+      this.setState({ arr: [] })
       return false;
     };
     Dawn.request({ url: './fake_data.json' }, (res) => {
@@ -209,24 +215,35 @@ export default class Search extends React.Component {
     return JSON.parse(getStorageData);
   }
 
-  rmHistoricalRecords(v,i,f) {
+  rmHistoricalRecords(v, i, f) {
     const his = this.getHistoricalRecords();
     this.rmAll();
-    if (f  || his.length <= 1) return;
-    const newHistoryData = his.filter((item,index)=>{return i !== index})
-    newHistoryData.forEach((item)=>{
+    if (f || his.length <= 1) return;
+    const newHistoryData = his.filter((item, index) => { return i !== index })
+    newHistoryData.forEach((item) => {
       this.setHistoricalRecords(item);
     })
-    this.setState({historyList:newHistoryData});
+    this.setState({ historyList: newHistoryData });
   }
 
   rmAll() {
     localStorage.removeItem(STORAGE_SEARCH_HISTORY);
-    this.setState({historyList:[],val:''});
+    this.setState({ historyList: [], val: '' });
   }
 
   closeHistory() {
     this.setState({ historyFlag: false });
+    localStorage.setItem(STORAGE_HISTORY_FLAG, JSON.stringify({show:false}));
+  }
+
+  openHistory() {
+    this.setState({ historyFlag: true });
+    localStorage.setItem(STORAGE_HISTORY_FLAG, JSON.stringify({show:true}));
+  }
+
+  getHistoryFlag() {
+    const getStorageData = localStorage.getItem(STORAGE_HISTORY_FLAG) || false;
+    return getStorageData ? JSON.parse(getStorageData).show : false;
   }
 }
 
@@ -238,7 +255,7 @@ export class History extends React.Component {
     super(props)
     this.props = props;
     if (!this.props.historyFlag) return;
-    this.state =  {rmHistoricalP:false};
+    this.state = { rmHistoricalP: false };
   }
 
 
@@ -258,7 +275,7 @@ export class History extends React.Component {
               <div
                 className={isChoice ? 'history-item-color' : 'history-item'}
                 key={item}
-                onDoubleClick={this.onDoubleClick.bind(this,item,hIndex)}
+                onDoubleClick={this.onDoubleClick.bind(this, item, hIndex)}
                 onClick={this.props.itemClick ? () => { this.props.itemClick(item, hIndex) } : ''}>
                 {item}
               </div>
@@ -266,38 +283,38 @@ export class History extends React.Component {
           }) : ''
         }
         {
-          historyFlag ? 
-          (<div className='close-history'>
-            <div onClick={this.props.closeHistory}>关闭历史记录</div>
-          </div>) : ''
+          historyFlag ?
+            (<div className='close-history'>
+              <div onClick={this.props.closeHistory}>关闭历史记录</div>
+            </div>) : ''
         }
         {
-          rmHistoricalP ? 
-          (<div  className = 'rm-history-b'>
-            <div>
-              <img src = {imgUrl} />
-              <div onClick = {this.rmHistory.bind(this,false)}>删除当前历史</div>
-              <div onClick = {this.rmHistory.bind(this,true)}>删除全部历史</div>
-              <div onClick = {this.rmBack.bind(this)}>返回</div>
-            </div>
-          </div>) : ''
+          rmHistoricalP ?
+            (<div className='rm-history-b'>
+              <div>
+                <img src={imgUrl} />
+                <div onClick={this.rmHistory.bind(this, false)}>删除当前历史</div>
+                <div onClick={this.rmHistory.bind(this, true)}>删除全部历史</div>
+                <div onClick={this.rmBack.bind(this)}>返回</div>
+              </div>
+            </div>) : ''
         }
       </div>
     )
   }
 
-  onDoubleClick(item,index) {
+  onDoubleClick(item, index) {
     this.historyItem = item;
     this.historyIndex = index;
-    this.setState({rmHistoricalP:true});
+    this.setState({ rmHistoricalP: true });
   }
 
   rmBack() {
-    this.setState({rmHistoricalP:false});
+    this.setState({ rmHistoricalP: false });
   }
 
   rmHistory(flag) {
     this.rmBack();
-    this.props.rmHistoricalRecords(this.historyItem,this.historyIndex,flag);
+    this.props.rmHistoricalRecords(this.historyItem, this.historyIndex, flag);
   }
 }
