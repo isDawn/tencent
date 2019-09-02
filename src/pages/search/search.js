@@ -5,6 +5,27 @@ import eye_img_url from "../../assets/img/eye.png";
 require('./search.css');
 const STORAGE_SEARCH_HISTORY = 'search_history_storage';
 const STORAGE_HISTORY_FLAG = 'history_flag_storage';
+
+/** 
+ * @param {Object} props 
+ * content 部分
+*/
+const Content = function(props) {
+  const { list, index, Iindex, array, val } = props;
+  const isTrue = Iindex === index;
+  array.push(isTrue);
+  const newStr = array.includes(true) ? list : list.split(val).join(`<font color=red>${val}</font>`)
+  return (
+    <div className={isTrue ? 'active-item-color' : 'search-item'}
+      onClick={()=>{this.props.itemClick(list, Iindex)}}>
+      <p dangerouslySetInnerHTML={{ __html: newStr }} />
+    </div>
+  )
+}
+
+/** 
+ * search ***
+*/
 export default class Search extends React.Component {
   constructor(props) {
     super(props);
@@ -21,9 +42,6 @@ export default class Search extends React.Component {
    */
   render() {
     const { arr = [], val, historyFlag, historyList, isUserWrite, index } = this.state;
-    const className = 'search-item';
-    const active = 'active-item-color';
-    const newArr = [];
     return (
       <div className="search-b">
         <div className = 'input-and-eye'>
@@ -40,15 +58,16 @@ export default class Search extends React.Component {
         <div className="search-content">
           {
             isUserWrite && val ? arr.map((item, Iindex) => {
-              const isTrue = Iindex === index;
-              newArr.push(isTrue);
-              const newStr = newArr.includes(true) ? item : item.split(val).join(`<font color=red>${val}</font>`)
               return (
-                <div className={isTrue ? active : className}
-                  onClick={this.itemClick.bind(this, item, Iindex)}
-                  key={item}>
-                  <p dangerouslySetInnerHTML={{ __html: newStr }} />
-                </div>
+                <Content
+                  list = {item}
+                  index = {index}
+                  Iindex = {Iindex}
+                  array = {[]}
+                  key = {item}
+                  val = {val}
+                  itemClick = {this.itemClick.bind(this)}
+                />
               )
             }) :
               <History
