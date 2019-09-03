@@ -1,31 +1,11 @@
+/* eslint-disable react/jsx-no-comment-textnodes */
 import React from 'react';
 import Dawn from "../../common/api.js";
-import his_img_url from "../../assets/img/rm-his.jpg";
-import eye_img_url from "../../assets/img/eye.png";
+import {Content,CloseHistory,ClearHistory,HistoryContent,Switch} from "./copmonnt";
 require('./search.css');
 const STORAGE_SEARCH_HISTORY = 'search_history_storage';
 const STORAGE_HISTORY_FLAG = 'history_flag_storage';
 
-/** 
- * @param {Object} props 
- * content 部分
-*/
-const Content = function(props) {
-  const { list, index, Iindex, array, val } = props;
-  const isTrue = Iindex === index;
-  console.log(index)
-  console.log(Iindex)
-  console.log(isTrue)
-  array.push(isTrue);
-  console.log(array)
-  const newStr = array.includes(true) ? list : list.split(val).join(`<font color=red>${val}</font>`)
-  return (
-    <div className={isTrue ? 'active-item-color' : 'search-item'}
-      onClick={()=>{props.itemClick(list, Iindex)}}>
-      <p dangerouslySetInnerHTML={{ __html: newStr }} />
-    </div>
-  )
-}
 
 /** 
  * search ***
@@ -46,7 +26,6 @@ export default class Search extends React.Component {
    */
   render() {
     const { arr = [], val, historyFlag, historyList, isUserWrite, index } = this.state;
-    const array = [];
     return (
       <div className="search-b">
         <div className = 'input-and-eye'>
@@ -58,23 +37,21 @@ export default class Search extends React.Component {
             onKeyDown={this.keyCode.bind(this)}
             onChange={this.onChange.bind(this)}
           />
-         { !historyFlag && <img className='eyes' src = {eye_img_url} onClick = {this.openHistory.bind(this)} />}
+          <Switch 
+            historyFlag = {historyFlag}
+            openHistory = {this.openHistory.bind(this)}
+          />
         </div>
         <div className="search-content">
           {
-            isUserWrite && val ? arr.map((item, Iindex) => {
-              return (
-                <Content
-                  list = {item}
-                  index = {index}
-                  Iindex = {Iindex}
-                  array = {array}
-                  key = {item}
-                  val = {val}
-                  itemClick = {this.itemClick.bind(this)}
-                />
-              )
-            }) :
+            isUserWrite && val ? 
+              <Content
+                index = {index}
+                val = {val}
+                arr = {arr}
+                itemClick = {this.itemClick.bind(this)}
+              />
+              :
               <History
                 historyFlag={historyFlag}
                 historyList={historyList}
@@ -82,7 +59,7 @@ export default class Search extends React.Component {
                 itemClick={this.itemClick.bind(this)}
                 closeHistory={this.closeHistory.bind(this)}
                 rmHistoricalRecords={this.rmHistoricalRecords.bind(this)}
-              />
+              /> 
           }
         </div>
       </div>
@@ -105,11 +82,9 @@ export default class Search extends React.Component {
   onChange() {
     const _val = this.refs.input.value || '';
     const _this = this;
-    this.setVal(_val, true);
-    if (!_val) {
-      this.setState({ arr: [] })
+    if (!_this.setValue(_val, true)) {
       return false;
-    };
+    }
     Dawn.request({ url: './fake_data.json' }, (res) => {
       _this.setState({ arr: this.handleBackData(res, _val) });
     });
@@ -120,30 +95,31 @@ export default class Search extends React.Component {
   }
 
   itemClick(val, index) {
+    console.log('----')
     if (!this.isMultipleClicks) {
       this.isMultipleClicks = true;
-      if (!val) return;
-      this.setVal(val, false);
-      this.setState({ index: index });
+      this.setState({ index, val});
       this.confrimClick(val);
       setTimeout(() => { this.isMultipleClicks = false; }, 500)
     }
   }
 
-  setVal(val, updateVal) {
-    if (updateVal) {
-      let isUserWrite = true;
-      let index = this.state.index;
-      let historyList = [];
+  setValue(val, updateUserChoice) {
+    let { isUserWrite, index, arr, historyList } = this.state;
+    let status = true;
+    if (updateUserChoice) {
       this.userVal = val;
-      if (!val) {
-        isUserWrite = false;
-        index = -1;
-        historyList = this.getHistoricalRecords();
-      }
-      this.setState({ isUserWrite, index, historyList });
+      isUserWrite  = true;
     }
-    this.setState({ val: val });
+    if (!val) {
+      status = false;
+      isUserWrite = false;
+      arr = [];
+      index = -1;
+      historyList = this.getHistoricalRecords();
+    }
+    this.setState({val, isUserWrite, index, historyList, arr});
+    return status;
   }
 
   isAssociation(kc) {
@@ -154,12 +130,12 @@ export default class Search extends React.Component {
   }
 
   keyCode(e) {
-    const kc = e.keyCode || 0;
+    const code = e.keyCode || 0;
     const _val = this.refs.input.value || '';
-    if (!this.isAssociation(kc)) return;
+    if (!this.isAssociation(code)) return;
     const len = this.isSearch() ? this.state.arr.length : this.state.historyList.length;
     let last = this.state.index;
-    if (kc === 38) {
+    if (code === 38) {
       e.preventDefault();
       if (last === -1) {
         last = len;
@@ -168,7 +144,7 @@ export default class Search extends React.Component {
         this.setNowItem();
       });
     }
-    if (kc === 40) {
+    if (code === 40) {
       if (last === len - 1) {
         last = -2;
       }
@@ -176,7 +152,7 @@ export default class Search extends React.Component {
         this.setNowItem();
       });
     }
-    if (kc === 13) {
+    if (code === 13) {
       this.confrimClick(_val);
     }
   }
@@ -195,7 +171,7 @@ export default class Search extends React.Component {
       if (index === -1) {
         _item = this.userVal;
       }
-      this.setVal(_item);
+      this.setValue(_item,false);
     }
   }
 
@@ -228,8 +204,7 @@ export default class Search extends React.Component {
   */
   setHistoricalRecords(val) {
     let newArr = this.getHistoricalRecords();
-    let existence = newArr.some((item) => { return item === val; })
-    if (existence) return;
+    if (newArr.some((item) => { return item === val; })) return;
     newArr.push(val);
     console.log('set_storage---', newArr)
     localStorage.setItem(STORAGE_SEARCH_HISTORY, JSON.stringify(newArr));
@@ -273,16 +248,16 @@ export default class Search extends React.Component {
 }
 
 
+
+
 // history
 
 export class History extends React.Component {
   constructor(props) {
     super(props)
     this.props = props;
-    if (!this.props.historyFlag) return;
     this.state = { rmHistoricalP: false };
   }
-
 
   /** 
    * history----html
@@ -290,40 +265,25 @@ export class History extends React.Component {
   render() {
     const { historyList, index, historyFlag } = this.props;
     const rmHistoricalP = this.state ? this.state.rmHistoricalP : false;
-    if (!historyList || historyList.length === 0) return false;
     return (
       <div className="search-history" >
-        {
-          historyFlag ? historyList.map((item, hIndex) => {
-            const isChoice = index === hIndex;
-            return (
-              <div
-                className={isChoice ? 'history-item-color' : 'history-item'}
-                key={item}
-                onDoubleClick={this.onDoubleClick.bind(this, item, hIndex)}
-                onClick={this.props.itemClick ? () => { this.props.itemClick(item, hIndex) } : ''}>
-                {item}
-              </div>
-            )
-          }) : ''
-        }
-        {
-          historyFlag ?
-            (<div className='close-history'>
-              <div onClick={this.props.closeHistory}>关闭历史记录</div>
-            </div>) : ''
-        }
-        {
-          rmHistoricalP ?
-            (<div className='rm-history-b'>
-              <div>
-                <img src={his_img_url} />
-                <div onClick={this.rmHistory.bind(this, false)}>删除当前历史</div>
-                <div onClick={this.rmHistory.bind(this, true)}>删除全部历史</div>
-                <div onClick={this.rmBack.bind(this)}>返回</div>
-              </div>
-            </div>) : ''
-        }
+        <HistoryContent
+          itemClick = {this.props.itemClick}
+          onDoubleClick = {this.onDoubleClick.bind(this)}
+          historyFlag = {historyFlag}
+          index = {index}
+          historyList = {historyList}
+        />
+        <CloseHistory 
+          closeHistory = {this.props.closeHistory}
+          historyFlag = {historyFlag}
+          historyList = {historyList}
+        />
+        <ClearHistory 
+          rmHistoricalP = {rmHistoricalP}
+          rmBack = {this.rmBack.bind(this)}
+          rmHistory = {this.rmHistory.bind(this)}
+        />
       </div>
     )
   }
