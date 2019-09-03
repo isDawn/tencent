@@ -13,11 +13,15 @@ const STORAGE_HISTORY_FLAG = 'history_flag_storage';
 const Content = function(props) {
   const { list, index, Iindex, array, val } = props;
   const isTrue = Iindex === index;
+  console.log(index)
+  console.log(Iindex)
+  console.log(isTrue)
   array.push(isTrue);
+  console.log(array)
   const newStr = array.includes(true) ? list : list.split(val).join(`<font color=red>${val}</font>`)
   return (
     <div className={isTrue ? 'active-item-color' : 'search-item'}
-      onClick={()=>{this.props.itemClick(list, Iindex)}}>
+      onClick={()=>{props.itemClick(list, Iindex)}}>
       <p dangerouslySetInnerHTML={{ __html: newStr }} />
     </div>
   )
@@ -42,6 +46,7 @@ export default class Search extends React.Component {
    */
   render() {
     const { arr = [], val, historyFlag, historyList, isUserWrite, index } = this.state;
+    const array = [];
     return (
       <div className="search-b">
         <div className = 'input-and-eye'>
@@ -63,7 +68,7 @@ export default class Search extends React.Component {
                   list = {item}
                   index = {index}
                   Iindex = {Iindex}
-                  array = {[]}
+                  array = {array}
                   key = {item}
                   val = {val}
                   itemClick = {this.itemClick.bind(this)}
