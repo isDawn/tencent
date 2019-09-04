@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-no-comment-textnodes */
 import React from 'react';
 import {request} from "../../common/api.js";
-import {Content,CloseHistory,ClearHistory,HistoryContent,Switch} from "./copmonnt";
+import {Content,CloseHistory,ClearHistory,HistoryContent,Switch} from "./copmonent";
 require('./search.css');
 const STORAGE_SEARCH_HISTORY = 'search_history_storage';
 const STORAGE_HISTORY_FLAG = 'history_flag_storage';
