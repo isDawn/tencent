@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-no-comment-textnodes */
 import React from 'react';
-import Dawn from "../../common/api.js";
+import {request} from "../../common/api.js";
 import {Content,CloseHistory,ClearHistory,HistoryContent,Switch} from "./copmonnt";
 require('./search.css');
 const STORAGE_SEARCH_HISTORY = 'search_history_storage';
@@ -85,7 +85,7 @@ export default class Search extends React.Component {
     if (!_this.setValue(_val, true)) {
       return false;
     }
-    Dawn.request({ url: './fake_data.json' }, (res) => {
+    request({ url: './fake_data.json' }, (res) => {
       _this.setState({ arr: this.handleBackData(res, _val) });
     });
   }
