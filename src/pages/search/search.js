@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-no-comment-textnodes */
 import React from 'react';
-import {request} from "../../common/api.js";
-import {Content,CloseHistory,ClearHistory,HistoryContent,Switch} from "./copmonent";
+import { request, cloneDeep, objCompare } from "../../common/api.js";
+import { Content, CloseHistory, ClearHistory, HistoryContent, Switch } from "./copmonent";
 require('./search.css');
 const STORAGE_SEARCH_HISTORY = 'search_history_storage';
 const STORAGE_HISTORY_FLAG = 'history_flag_storage';
@@ -69,9 +69,9 @@ export default class Search extends React.Component {
   /** 
    * 组件加载
   */
-  componentDidMount() { 
+  componentDidMount() {
     this.setState({historyFlag:this.getHistoryFlag()});
-  }
+  } 
 
 
   /**
@@ -95,7 +95,6 @@ export default class Search extends React.Component {
   }
 
   itemClick(val, index) {
-    console.log('----')
     if (!this.isMultipleClicks) {
       this.isMultipleClicks = true;
       this.setState({ index, val});

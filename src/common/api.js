@@ -1,6 +1,6 @@
+/* eslint-disable no-const-assign */
 /* eslint-disable no-unused-vars */
-class Dawn {
-
+ class Dawn {
     /*** 
      * @param {Object} 入参
      * @param {Function} 回调
@@ -23,9 +23,9 @@ class Dawn {
     /*** 
      * @param {String} funType // 方法类型
      * @param {Number} timer // 延时时间
-     * @param {Object} _this // this
     */
-    static throttle(funType, timer, _this) {
+    static throttle(funType, timer) {
+        const _this = this;
         if (!funType || !timer || !_this) {
             return false;
         }
@@ -108,12 +108,60 @@ class Dawn {
     static _isArray(value) {
         return Object.prototype.toString.call(value) === "[object Array]";
     }
+
+    /** 
+     * 深拷贝
+     * targetObj = {a:1};
+     * sourceObj = {a:2,b:3};
+     * case cloneDeep(targetObj,targetObj) // {a:1,b:2,c:3};
+     * targetObj = [1,2];
+     * sourceObj = [3,4];
+     * case cloneDeep(targetObj,targetObj) // [1,2,3,4]};
+     * 目标对象和源对象的类型必须是一致的 如不一致 返回源对象 ⚠️
+    */
+    static cloneDeep(target,source,flag) { 
+        if (!source || (!this.isObj(target,source) && !this.isArray(target,source) && !flag) ) {
+            return target;
+        }
+        if ( (this._isArray(source) && source.length <= 0)) {
+            return [];
+        }
+        if ( (this._isObj(source) && Object.keys(source).length <= 0)) {
+            return {};
+        }
+        let sourceObj = {};
+		if (this._isObj(source)) {
+				for (let key in source) {
+					if (!this._isObj(source[key]) && !this._isArray(source[key])) {
+						sourceObj[key] = source[key];
+					} else {
+						sourceObj[key] = cloneDeep(false,source[key],true);
+					}
+				}
+        }
+        if (Array.isArray(source)) {
+            sourceObj = source.map((item) => {
+                if (!this._isObj(item) && !this._isArray(item)) {
+                    return item
+                } else {
+                    return cloneDeep(false,item,true);
+                }
+            })
+        }
+		return target ? this._isArray(target) ? [...target,...sourceObj] : {...target,...sourceObj} : sourceObj;
+    }
 }
+
 // 获取Dawn源数据中可外部使用的function
-const { request, throttle, objCompare } = Dawn;
+const objCompare = Dawn.objCompare.bind(Dawn);
+const request = Dawn.request.bind(Dawn);
+const throttle = Dawn.throttle.bind(Dawn);
+const cloneDeep = Dawn.cloneDeep.bind(Dawn);
+
 // 抛出可用外部方法以供使用
 export {
-    request, //sever请求
+    request, //server请求
     throttle, // 时间戳节流
-    objCompare // 是否相同obj or array
+    objCompare, // 是否相同obj or array
+    cloneDeep // 深拷贝
 }
