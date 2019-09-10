@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-no-comment-textnodes */
 import React from 'react';
-import { request, cloneDeep, objCompare } from "../../common/api.js";
+import { request } from "../../common/api.js";
 import { Content, CloseHistory, ClearHistory, HistoryContent, Switch } from "./copmonent";
 require('./search.css');
 const STORAGE_SEARCH_HISTORY = 'search_history_storage';
