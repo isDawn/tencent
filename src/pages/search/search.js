@@ -2,6 +2,7 @@
 import React from 'react';
 import {request} from "../../common/api.js";
 import {Content,CloseHistory,ClearHistory,HistoryContent,Switch} from "./copmonent";
+import Oath from "../../common/Promise.js";
 require('./search.css');
 const STORAGE_SEARCH_HISTORY = 'search_history_storage';
 const STORAGE_HISTORY_FLAG = 'history_flag_storage';
@@ -69,7 +70,7 @@ export default class Search extends React.Component {
   /** 
    * 组件加载
   */
-  componentDidMount() { 
+  componentDidMount() {
     this.setState({historyFlag:this.getHistoryFlag()});
   }
 
@@ -85,9 +86,12 @@ export default class Search extends React.Component {
     if (!_this.setValue(_val, true)) {
       return false;
     }
-    request({ url: './fake_data.json' }, (res) => {
+    request({ url: './fake_data.json' }).then((res)=>{
+      console.log(res)
       _this.setState({ arr: this.handleBackData(res, _val) });
-    });
+    }).catch((err)=>{
+      console.log(err,'err')
+    })
   }
 
   handleBackData(res, val) {

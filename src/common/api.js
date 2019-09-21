@@ -1,21 +1,24 @@
 /* eslint-disable no-unused-vars */
+import Oath from './Promise.js';
 class Dawn {
 
     /*** 
      * @param {Object} 入参
      * @param {Function} 回调
     */
-    static request(param, callBack) {
-        fetch(param.url, {
-            method: "GET",
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-        }).then(
-            response => response.json()
-        ).then(res => {
-            callBack(res)
+    static request(param) {
+        return new Oath((resolve, reject) => {
+                fetch(param.url, {
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                }).then(
+                    response => response.json()
+                ).then(res => {
+                    resolve(res);
+                })
         })
     }
 
