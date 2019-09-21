@@ -87,10 +87,9 @@ export default class Search extends React.Component {
       return false;
     }
     request({ url: './fake_data.json' }).then((res)=>{
-      console.log(res)
       _this.setState({ arr: this.handleBackData(res, _val) });
     }).catch((err)=>{
-      console.log(err,'err')
+      // TODO 
     })
   }
 
