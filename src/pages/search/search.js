@@ -72,17 +72,38 @@ export default class Search extends React.Component {
   */
   componentDidMount() {
     this.setState({historyFlag:this.getHistoryFlag()});
+    // new Oath((res,rej)=>{
+    //   // setTimeout(()=>{rej(1)},0)
+    //   rej(1)
+    // }).then((val)=>{
+    //   console.log(val);
+    //   return 2;
+    // }).then((val2)=>{
+    //   console.log(val2)
+    // },(val)=>{
+    //   console.log("33333",val)
+    //   return 100;
+    // }).then((val)=>{
+    //   console.log('then',val)
+    //   return 111
+    // }).then((sha)=>{
+    //   console.log("shaawocao=====",sha)
+    // })
+
     new Oath((res,rej)=>{
-      setTimeout(()=>{rej(1)},0)
-    }).then((val)=>{
-      console.log(val);
-      return 2;
-    }).then((val2)=>{
-      console.log(val2)
-    }).catch((err)=>{
-      console.log('0000000')
+      setTimeout(()=>{
+        rej(1)
+      },0)
     }).then(()=>{
-      console.log('then')
+      console.log(1)
+    }).then(()=>{
+      console.log(2)
+    },(val)=>{
+      setTimeout(()=>{console.log("延时器")},0)
+      console.log(3,val)
+      return "wocao"
+    }).then((val)=>{
+      console.log(4,val)
     })
   }
 
