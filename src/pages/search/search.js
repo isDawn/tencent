@@ -72,6 +72,18 @@ export default class Search extends React.Component {
   */
   componentDidMount() {
     this.setState({historyFlag:this.getHistoryFlag()});
+    new Oath((res,rej)=>{
+      setTimeout(()=>{rej(1)},0)
+    }).then((val)=>{
+      console.log(val);
+      return 2;
+    }).then((val2)=>{
+      console.log(val2)
+    }).catch((err)=>{
+      console.log('0000000')
+    }).then(()=>{
+      console.log('then')
+    })
   }
 
 
