@@ -1,22 +1,25 @@
 /* eslint-disable no-const-assign */
 /* eslint-disable no-unused-vars */
+// import { Promisest } from "./Promise";
  class Dawn {
     /*** 
      * @param {Object} 入参
      * @param {Function} 回调
     */
-    static request(param, callBack) {
-        fetch(param.url, {
-            method: "GET",
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-        }).then(
-            response => response.json()
-        ).then(res => {
-            callBack(res)
-        })
+    static request(param) {
+        // return new Promisest((resolve, reject) => {
+                fetch(param.url, {
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                }).then(
+                    response => response.json()
+                ).then(res => {
+                    // resolve(res);
+                })
+        // })
     }
 
 

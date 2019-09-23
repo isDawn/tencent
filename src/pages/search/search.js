@@ -1,7 +1,8 @@
 /* eslint-disable react/jsx-no-comment-textnodes */
 import React from 'react';
-import { request } from "../../common/api.js";
-import { Content, CloseHistory, ClearHistory, HistoryContent, Switch } from "./copmonent";
+import {request} from "../../common/api.js";
+import {Content,CloseHistory,ClearHistory,HistoryContent,Switch} from "./copmonent";
+import { Promisest } from "../../common/Promisest.js";
 require('./search.css');
 const STORAGE_SEARCH_HISTORY = 'search_history_storage';
 const STORAGE_HISTORY_FLAG = 'history_flag_storage';
@@ -71,7 +72,48 @@ export default class Search extends React.Component {
   */
   componentDidMount() {
     this.setState({historyFlag:this.getHistoryFlag()});
-  } 
+    // const P = new Promisest((res,rej)=>{
+    //   res(0)
+    // })
+    const a = new Promisest((res,rej)=>{
+        // setTimeout(()=>{
+        //   rej(2)
+        // },1000)
+        // res(3)
+        setTimeout(()=>{
+          res(function(){console.log(1)});
+        },1000)
+    })
+    const b = new Promisest((res,rej)=>{
+        res(2)
+  })
+  const c = new Promisest((res,rej)=>{
+    res(3);
+})
+Promisest.all([a,b,c]).then((res)=>{
+    console.log('all-----',res)
+  }).catch((err)=>{
+    console.log("!!",err)
+  })
+
+    // P.then((res)=>{
+    //   console.log('then----',res)
+    // })
+    // a.then((res)=>{
+    //   console.log('then1----',res)
+    // },(val)=>{
+    //   console.log("111111",val)
+    // }).then((res)=>{
+    //   console.log('then2----',res)
+    //   return 7
+    // }).catch(err=>{
+    //   console.log('err',err)
+    //   return 8
+    // }).then((r)=>{
+    //   console.log('then3--------',r) 
+    // })
+    // console.log(P)
+  }
 
 
   /**
@@ -85,9 +127,11 @@ export default class Search extends React.Component {
     if (!_this.setValue(_val, true)) {
       return false;
     }
-    request({ url: './fake_data.json' }, (res) => {
-      _this.setState({ arr: this.handleBackData(res, _val) });
-    });
+    // request({ url: './fake_data.json' }).then((res)=>{
+    //   _this.setState({ arr: this.handleBackData(res, _val) });
+    // }).catch((err)=>{
+      
+    // })
   }
 
   handleBackData(res, val) {
