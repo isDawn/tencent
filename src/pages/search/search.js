@@ -73,8 +73,8 @@ export default class Search extends React.Component {
   componentDidMount() {
     this.setState({historyFlag:this.getHistoryFlag()});
     // new Oath((res,rej)=>{
-    //   // setTimeout(()=>{rej(1)},0)
-    //   rej(1)
+    //   setTimeout(()=>{rej(1)},1000)
+    //   // rej(1)
     // }).then((val)=>{
     //   console.log(val);
     //   return 2;
@@ -90,20 +90,53 @@ export default class Search extends React.Component {
     //   console.log("shaawocao=====",sha)
     // })
 
-    new Oath((res,rej)=>{
-      setTimeout(()=>{
-        rej(1)
-      },0)
-    }).then(()=>{
-      console.log(1)
-    }).then(()=>{
-      console.log(2)
-    },(val)=>{
-      setTimeout(()=>{console.log("延时器")},0)
-      console.log(3,val)
-      return "wocao"
-    }).then((val)=>{
-      console.log(4,val)
+    // new Oath((res,rej)=>{
+    //   // setTimeout(()=>{
+    //   //   res(1)
+    //   // },0)
+    //   rej(2);
+    // }).then((val)=>{
+    //   setTimeout(()=>{console.log("延时器1")},0);
+    //   console.log(1,val)
+    // }).then(()=>{
+    //   console.log(2)
+    // },(val)=>{
+    //   setTimeout(()=>{console.log("延时器")},0)
+    //   console.log(3,val)
+    //   return "wocao"
+    // }).then((val)=>{
+    //   console.log(4,val)
+    // })
+
+
+    // const a = new Oath((res,rej)=>{
+    //   setTimeout(()=>{
+    //     res(1)
+    //   },1000);
+    // }).then(res=>{
+    //   console.log('res--==========',res)
+    // })
+    // const b = new Oath((res,rej)=>{
+    //   // setTimeout(()=>{
+    //     res(2)
+    //   // },100)
+    // }).then(res=>{
+    //   console.log('res----',res)
+    // })
+    // Oath.all([a,b]).then('all',(res)=>{
+    //   console.log('res',res)
+    // })
+    const p1 = new Promise((resolve, reject) => {
+      resolve('hello');
+    })
+    const p2 = new Promise((resolve, reject) => {
+      resolve('hello');
+    })
+    const p3 = new Promise((resolve, reject) => {
+      resolve('hello');
+    })
+    Promise.all([p1,p2,p3]).then(res=>{
+      console.log('res---',res)
     })
   }
 
