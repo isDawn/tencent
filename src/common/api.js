@@ -1,13 +1,13 @@
 /* eslint-disable no-const-assign */
 /* eslint-disable no-unused-vars */
-// import { Promisest } from "./Promise";
+import { Promisest } from "./Promisest";
  class Dawn {
     /*** 
      * @param {Object} 入参
      * @param {Function} 回调
     */
     static request(param) {
-        // return new Promisest((resolve, reject) => {
+        return new Promisest((resolve, reject) => {
                 fetch(param.url, {
                     method: "GET",
                     headers: {
@@ -17,9 +17,9 @@
                 }).then(
                     response => response.json()
                 ).then(res => {
-                    // resolve(res);
+                    resolve(res);
                 })
-        // })
+        })
     }
 
 

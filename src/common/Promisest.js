@@ -1,26 +1,26 @@
 
-class Promisest {
+ class Promisest {
     constructor(backPromisestFun, getPromiseData) {
         this.PromiseStatus = Promisest.data(getPromiseData).status;
-        this.result = Promisest.data(getPromiseData).result;
+        this.PromiseValue = Promisest.data(getPromiseData).result;
         backPromisestFun && backPromisestFun(this.resolve.bind(this), this.reject.bind(this))
-        this.rejectBackArr = null;
-        this.resolveBackArr = null;
-        this.res = null;
-        this.rej = null;
+        this.rejectBack = null;
+        this.resolveBack = null;
+        this.nextResolve = null;
+        this.nextReject = null;
     }
 
     resolve(result) {
         if (this.PromiseStatus === 'pending') {
-            this.PromiseStatus = 'fulfilled';
-            this.result = result;
-            if (!this.res) {
-                return new Promisest(() => {}, { status: this.PromiseStatus, result: this.result });
+            this.PromiseStatus = 'resolved';
+            this.PromiseValue = result;
+            if (!this.nextResolve) {
+                return new Promisest(() => {}, { status: this.PromiseStatus, result: this.PromiseValue });
             }
-            if (this.resolveBackArr) {
-                this.res(this.resolveBackArr && this.resolveBackArr(this.result));
+            if (this.resolveBack) {
+                this.nextResolve(this.resolveBack && this.resolveBack(this.PromiseValue));
             } else {
-                this.res(this.result);
+                this.nextResolve(this.PromiseValue);
             }
         }
     }
@@ -28,44 +28,44 @@ class Promisest {
     reject(reason) {
         if (this.PromiseStatus === 'pending') {
             this.PromiseStatus = 'rejected';
-            this.result = reason;
-            if (!this.rej) {
-                return new Promisest(() => {}, { status: this.PromiseStatus, result: this.result });
+            this.PromiseValue = reason;
+            if (!this.nextReject) {
+                return new Promisest(() => {}, { status: this.PromiseStatus, result: this.PromiseValue });
             }
-            if (this.rejectBackArr) {
-                this.res(this.rejectBackArr(this.result));
+            if (this.rejectBack) {
+                this.nextResolve(this.rejectBack(this.PromiseValue));
             } else {
-                this.rej(this.result);
+                this.nextReject(this.PromiseValue);
             }
         }
     }
 
     then(resBack, rejBack) {
-        if (this.PromiseStatus === 'fulfilled') {
-            this.result = resBack && resBack(this.result);
+        if (this.PromiseStatus === 'resolved') {
+            this.PromiseValue = resBack && resBack(this.PromiseValue);
         } else if (this.PromiseStatus === 'rejected') {
             if (rejBack) {
-                this.result = rejBack && rejBack(this.result);
-                this.PromiseStatus = 'fulfilled';
+                this.PromiseValue = rejBack && rejBack(this.PromiseValue);
+                this.PromiseStatus = 'resolved';
             } 
         } else {
-            this.resolveBackArr = resBack ? resBack : null;
-            this.rejectBackArr = rejBack ? rejBack : null;
-            return new Promisest((res,rej) => { this.res = res; this.rej = rej }, { status: this.PromiseStatus, result: this.result });
+            this.resolveBack = resBack ? resBack : null;
+            this.rejectBack = rejBack ? rejBack : null;
+            return new Promisest((res,rej) => { this.nextResolve = res; this.nextReject = rej }, { status: this.PromiseStatus, result: this.result });
         }    
-        return new Promisest(() => {  }, { status: this.PromiseStatus, result: this.result });
+        return new Promisest(() => {  }, { status: this.PromiseStatus, result: this.PromiseValue });
     }
 
     catch(catchBack) {
         if (this.PromiseStatus === 'rejected') {
             if (catchBack) {
-                this.result = catchBack(this.result);
-                this.PromiseStatus = 'fulfilled';
-                return new Promisest(() => {}, { status: this.PromiseStatus, result: this.result });
+                this.PromiseValue = catchBack(this.PromiseValue);
+                this.PromiseStatus = 'resolved';
+                return new Promisest(() => {}, { status: this.PromiseStatus, result: this.PromiseValue });
             }
         } else {
-            this.rejectBackArr = catchBack ? catchBack : null;
-            return new Promisest((res,rej) => { this.res = res; this.rej = rej }, { status: this.PromiseStatus, result: this.result });
+            this.rejectBack = catchBack ? catchBack : null;
+            return new Promisest((res,rej) => { this.nextResolve = res; this.nextReject = rej }, { status: this.PromiseStatus, result: this.result });
         }
     }
 
@@ -88,7 +88,6 @@ class Promisest {
     }
 
     static allPromise(allPromise, index, len, arr, resolve, reject) {
-        // console.log('arr--------',arr)
         if (index < len) {
             allPromise[index].then((res) => {
                 if (this.isP(res)) {
@@ -130,6 +129,7 @@ class Promisest {
 
 }
 
-export {
-    Promisest
-}
+
+ export {
+    Promisest,
+ };
